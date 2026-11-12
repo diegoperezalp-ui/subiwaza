@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { ArrowRight, ClipboardPen, Handshake, Star, ShieldCheck, Gauge } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/domus/site-header";
@@ -7,8 +7,15 @@ import { CategoryIcon } from "@/components/domus/brand";
 import { CATEGORIES } from "@/lib/domus";
 import hero from "@/assets/hero-domus.jpg";
 import portrait from "@/assets/pro-portrait.jpg";
+import { getCurrentUser } from "@/lib/auth.functions";
+import { dashboardPath } from "@/lib/route-access";
 
 export const Route = createFileRoute("/")({
+  beforeLoad: async () => {
+    const user = await getCurrentUser();
+    if (user) throw redirect({ to: dashboardPath(user) });
+    throw redirect({ to: "/acceso" });
+  },
   head: () => ({
     meta: [
       { title: "Subiwaza — El profesional correcto, en tu puerta" },

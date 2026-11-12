@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -29,8 +29,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { categoryLabel, currency, tradeLabel, workerStats, type Job } from "@/lib/domus";
 import { domusActions, useDomus } from "@/lib/domus-store";
 import { cn } from "@/lib/utils";
+import { dashboardPath, requireAccount } from "@/lib/route-access";
 
 export const Route = createFileRoute("/panel")({
+  beforeLoad: async () => {
+    const user = await requireAccount();
+    throw redirect({ to: dashboardPath(user) });
+  },
   head: () => ({
     meta: [
       { title: "Mi panel — Subiwaza" },
@@ -142,7 +147,7 @@ function StatCard({
   );
 }
 
-function ClientView() {
+export function ClientView() {
   const state = useDomus();
   const mine = state.jobs.filter((j) => j.mine);
   const done = mine.filter((j) => j.status === "completado").length;
@@ -366,7 +371,7 @@ function WhatsAppContact({ phone }: { phone?: string }) {
   );
 }
 
-function ProView() {
+export function ProView() {
   const state = useDomus();
   const me = state.workers.find((w) => w.id === state.myWorkerId)!;
   const s = workerStats(state, me.id);

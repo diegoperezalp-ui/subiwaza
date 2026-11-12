@@ -11,8 +11,10 @@ import { Label } from "@/components/ui/label";
 import { CATEGORIES, URGENCY_LABEL, type Category, type Urgency } from "@/lib/domus";
 import { domusActions, useDomus } from "@/lib/domus-store";
 import { cn } from "@/lib/utils";
+import { requireAccount } from "@/lib/route-access";
 
 export const Route = createFileRoute("/publicar")({
+  beforeLoad: () => requireAccount("cliente"),
   head: () => ({
     meta: [
       { title: "Publicar un trabajo — Subiwaza" },

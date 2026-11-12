@@ -1,22 +1,21 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import {
-  ArrowLeft,
-  ArrowRight,
-  BriefcaseBusiness,
-  KeyRound,
-  ShieldCheck,
-  UserRound,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, BriefcaseBusiness, ShieldCheck, UserRound } from "lucide-react";
 import { CategoryIcon } from "@/components/domus/brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CATEGORIES, type Category } from "@/lib/domus";
 import { loginUser, registerUser } from "@/lib/auth.functions";
+import { dashboardPath } from "@/lib/route-access";
+import { getCurrentUser } from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/acceso")({
+  beforeLoad: async () => {
+    const user = await getCurrentUser();
+    if (user) throw redirect({ to: dashboardPath(user) });
+  },
   head: () => ({
     meta: [
       { title: "Tu cuenta — Subiwaza" },
@@ -37,7 +36,7 @@ function Acceso() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"cliente" | "profesional" | "ambos">("cliente");
+  const [role, setRole] = useState<"cliente" | "profesional" | null>(null);
   const [trade, setTrade] = useState<Category>("plomeria");
   const [zone, setZone] = useState("");
   const [contactConsent, setContactConsent] = useState(false);
@@ -47,16 +46,27 @@ function Acceso() {
     event.preventDefault();
     setBusy(true);
     try {
+      let account;
       if (registering) {
-        await registerUser({
-          data: { name, email, phone, password, role, trade, zone, contactConsent: true },
+        if (!role) throw new Error("Primero elige si te registras como cliente o especialista.");
+        account = await registerUser({
+          data: {
+            name,
+            email,
+            phone,
+            password,
+            role,
+            ...(role === "profesional" ? { trade } : {}),
+            zone,
+            contactConsent: true,
+          },
         });
         toast.success("¡Bienvenido a Subiwaza!", { description: "Tu cuenta ya está lista." });
       } else {
-        await loginUser({ data: { email, password } });
+        account = await loginUser({ data: { email, password } });
         toast.success("Sesión iniciada", { description: "Ya puedes continuar con tus trabajos." });
       }
-      await navigate({ to: "/panel" });
+      await navigate({ to: dashboardPath(account) });
     } catch (cause) {
       toast.error(cause instanceof Error ? cause.message : "No pudimos crear tu cuenta.");
     } finally {
@@ -109,8 +119,8 @@ function Acceso() {
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             {registering
-              ? "Un mismo perfil te permite buscar trabajos u ofrecer tus servicios."
-              : "Entra para ver tus trabajos, propuestas y actividad."}
+              ? "Elige qué tipo de cuenta quieres crear. Cada perfil tiene su propio espacio y herramientas."
+              : "Entra para ver el espacio y las herramientas de tu tipo de cuenta."}
           </p>
 
           <div className="mt-7 grid grid-cols-2 rounded-2xl border border-border bg-card/60 p-1.5">
@@ -131,6 +141,58 @@ function Acceso() {
           </div>
 
           <form onSubmit={submit} className="mt-7 space-y-5">
+            {registering && (
+              <fieldset className="space-y-3">
+                <legend className="font-semibold text-foreground">
+                  Primero, elige tu tipo de cuenta
+                </legend>
+                <div
+                  role="radiogroup"
+                  aria-label="Tipo de cuenta"
+                  className="grid gap-3 sm:grid-cols-2"
+                >
+                  {(
+                    [
+                      {
+                        value: "cliente",
+                        title: "Soy cliente",
+                        description: "Publica un trabajo y compara especialistas.",
+                        icon: UserRound,
+                      },
+                      {
+                        value: "profesional",
+                        title: "Soy especialista",
+                        description: "Encuentra trabajos y envía tus propuestas.",
+                        icon: BriefcaseBusiness,
+                      },
+                    ] as const
+                  ).map(({ value, title, description, icon: Icon }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      role="radio"
+                      aria-checked={role === value}
+                      onClick={() => setRole(value)}
+                      className={`group rounded-2xl border p-4 text-left transition duration-300 hover:-translate-y-0.5 ${role === value ? "border-primary bg-primary-soft shadow-glow" : "border-border bg-card/55 hover:border-primary/50"}`}
+                    >
+                      <span className="flex items-center gap-3">
+                        <span
+                          className={`grid h-11 w-11 place-items-center rounded-xl ${role === value ? "bg-primary text-primary-foreground" : "bg-secondary text-primary"}`}
+                        >
+                          <Icon className="h-5 w-5" />
+                        </span>
+                        <span>
+                          <span className="block font-semibold text-foreground">{title}</span>
+                          <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
+                            {description}
+                          </span>
+                        </span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+            )}
             {registering && (
               <div className="space-y-2">
                 <Label htmlFor="full-name">Nombre completo</Label>
@@ -190,33 +252,7 @@ function Acceso() {
                 </div>
               </div>
             )}
-            {registering && (
-              <div className="space-y-3">
-                <Label>¿Cómo quieres usar Subiwaza?</Label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(["cliente", "profesional", "ambos"] as const).map((value) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => setRole(value)}
-                      className={`flex min-h-20 flex-col items-center justify-center gap-2 rounded-2xl border text-xs font-semibold capitalize transition ${role === value ? "border-primary bg-primary-soft text-accent-foreground shadow-glow" : "border-border bg-card/50 text-muted-foreground hover:border-primary/50"}`}
-                    >
-                      <span className="grid h-8 w-8 place-items-center rounded-xl bg-secondary">
-                        {value === "cliente" ? (
-                          <UserRound className="h-4 w-4" />
-                        ) : value === "profesional" ? (
-                          <BriefcaseBusiness className="h-4 w-4" />
-                        ) : (
-                          <KeyRound className="h-4 w-4" />
-                        )}
-                      </span>
-                      {value}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-            {registering && role !== "cliente" && (
+            {registering && role === "profesional" && (
               <div className="space-y-2">
                 <Label htmlFor="trade">Tu oficio principal</Label>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -269,7 +305,7 @@ function Acceso() {
               size="lg"
               variant="hero"
               className="mt-2 w-full"
-              disabled={busy || (registering && !contactConsent)}
+              disabled={busy || (registering && (!contactConsent || !role))}
             >
               {busy ? "Un momento…" : registering ? "Crear mi cuenta" : "Entrar a Subiwaza"}
               <ArrowRight />
@@ -278,11 +314,6 @@ function Acceso() {
           <p className="mt-6 text-center text-xs leading-relaxed text-muted-foreground">
             Al continuar aceptas las reglas de convivencia de Subiwaza. Tus datos de contacto no se
             muestran en los trabajos públicos.
-          </p>
-          <p className="mt-8 text-center text-xs text-muted-foreground">
-            <Link to="/" className="hover:text-primary">
-              Explorar Subiwaza sin cuenta
-            </Link>
           </p>
         </div>
       </section>

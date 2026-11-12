@@ -10,8 +10,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { CATEGORIES, type Category } from "@/lib/domus";
 import { domusActions, useDomus } from "@/lib/domus-store";
+import { requireAccount } from "@/lib/route-access";
 
 export const Route = createFileRoute("/cuenta")({
+  beforeLoad: () => requireAccount(),
   head: () => ({
     meta: [
       { title: "Mi perfil — Subiwaza" },

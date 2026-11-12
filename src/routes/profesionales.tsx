@@ -6,8 +6,10 @@ import { CategoryIcon, PageIntro, PersonMark, Stars } from "@/components/domus/b
 import { CATEGORIES, tradeLabel, type Category } from "@/lib/domus";
 import { useDomus } from "@/lib/domus-store";
 import { cn } from "@/lib/utils";
+import { requireAccount } from "@/lib/route-access";
 
 export const Route = createFileRoute("/profesionales")({
+  beforeLoad: () => requireAccount("cliente"),
   head: () => ({
     meta: [
       { title: "Especialistas locales — Subiwaza" },

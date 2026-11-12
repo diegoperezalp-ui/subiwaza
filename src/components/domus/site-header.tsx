@@ -9,13 +9,6 @@ import { getCurrentUser, logoutUser } from "@/lib/auth.functions";
 import type { PublicUser } from "@/lib/auth.server";
 import { Logo } from "./brand";
 
-const NAV = [
-  { to: "/profesionales", label: "Profesionales" },
-  { to: "/trabajos", label: "Trabajos disponibles" },
-  { to: "/panel", label: "Mi panel" },
-  { to: "/cuenta", label: "Mi perfil" },
-] as const;
-
 export function SiteHeader({ overHero = false }: { overHero?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<PublicUser | null>(null);
@@ -26,6 +19,19 @@ export function SiteHeader({ overHero = false }: { overHero?: boolean }) {
     window.addEventListener("scroll", on, { passive: true });
     return () => window.removeEventListener("scroll", on);
   }, []);
+  const nav = user?.roles.includes("cliente")
+    ? [
+        { to: "/panel/cliente", label: "Mis trabajos" },
+        { to: "/profesionales", label: "Especialistas" },
+        { to: "/cuenta", label: "Mi perfil" },
+      ]
+    : user
+      ? [
+          { to: "/panel/especialista", label: "Mi actividad" },
+          { to: "/trabajos", label: "Buscar trabajos" },
+          { to: "/cuenta", label: "Mi perfil" },
+        ]
+      : [];
   useEffect(() => {
     let active = true;
     void getCurrentUser()
@@ -63,7 +69,7 @@ export function SiteHeader({ overHero = false }: { overHero?: boolean }) {
       >
         <Logo tone={light ? "light" : "dark"} />
         <nav className="hidden items-center gap-1 md:flex">
-          {NAV.map((n) => (
+          {nav.map((n) => (
             <Link
               key={n.to}
               to={n.to}
@@ -84,9 +90,15 @@ export function SiteHeader({ overHero = false }: { overHero?: boolean }) {
         <div className="flex items-center gap-2">
           {user ? (
             <div className="hidden items-center gap-2 sm:flex">
-              <Button asChild size="sm" variant="hero" className="h-10 px-4">
-                <Link to="/publicar">Publicar trabajo</Link>
-              </Button>
+              {user.roles.includes("cliente") ? (
+                <Button asChild size="sm" variant="hero" className="h-10 px-4">
+                  <Link to="/publicar">Publicar trabajo</Link>
+                </Button>
+              ) : (
+                <Button asChild size="sm" variant="hero" className="h-10 px-4">
+                  <Link to="/trabajos">Ver trabajos</Link>
+                </Button>
+              )}
               <Button
                 asChild
                 size="icon"
@@ -131,10 +143,12 @@ export function SiteHeader({ overHero = false }: { overHero?: boolean }) {
               </div>
               <nav className="mt-10 flex flex-col gap-1">
                 {[
-                  { to: "/", label: "Inicio" } as const,
-                  ...NAV,
-                  { to: "/publicar", label: "Publicar un trabajo" } as const,
-                  ...(!user ? [{ to: "/acceso", label: "Entrar o crear cuenta" } as const] : []),
+                  ...nav,
+                  ...(user?.roles.includes("cliente")
+                    ? [{ to: "/publicar", label: "Publicar un trabajo" } as const]
+                    : user
+                      ? [{ to: "/trabajos", label: "Ver trabajos" } as const]
+                      : [{ to: "/acceso", label: "Entrar o crear cuenta" } as const]),
                 ].map((n) => (
                   <Link
                     key={n.to}

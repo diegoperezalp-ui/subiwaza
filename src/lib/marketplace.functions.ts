@@ -104,22 +104,25 @@ function publicJob(
 export const getMarketplace = createServerFn({ method: "GET" }).handler(async () => {
   if (!isMongoConfigured()) return { ...emptyState(null), databaseReady: false };
   const user = await currentUser();
+  if (!user) return { ...emptyState(null), databaseReady: true };
   const db = await getDb();
-  const visibility = user
-    ? {
-        $or: [
-          { status: "abierto" },
-          { clientId: new ObjectId(user.id) },
-          { assignedWorkerId: user.id },
-          { "offers.workerId": user.id },
-        ],
-      }
-    : { status: "abierto" };
+  const isClient = user.roles.includes("cliente");
+  const isProfessional = user.roles.includes("profesional");
+  const visibleConditions = [
+    ...(isClient ? [{ clientId: new ObjectId(user.id) }] : []),
+    ...(isProfessional
+      ? [{ status: "abierto" }, { assignedWorkerId: user.id }, { "offers.workerId": user.id }]
+      : []),
+  ];
+  const visibility = { $or: visibleConditions };
   const [jobDocs, userDocs, reviewDocs] = await Promise.all([
     db.collection<JobDoc>("jobs").find(visibility).sort({ createdAt: -1 }).limit(100).toArray(),
     db
       .collection<UserDoc>("users")
-      .find({ roles: "profesional" }, { projection: { passwordHash: 0, email: 0, phone: 0 } })
+      .find(
+        isClient ? { roles: "profesional" } : { _id: new ObjectId(user.id), roles: "profesional" },
+        { projection: { passwordHash: 0, email: 0, phone: 0 } },
+      )
       .limit(200)
       .toArray(),
     user

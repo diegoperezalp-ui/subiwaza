@@ -115,8 +115,9 @@
     rgba(7, 15, 20, 0.25) 100%
   );
   --gradient-ambient:
-    radial-gradient(60rem 40rem at 10% -10%, rgba(38, 166, 154, 0.16), transparent 60%),
-    radial-gradient(50rem 36rem at 100% 10%, rgba(96, 125, 139, 0.17), transparent 60%);
+    radial-gradient(56rem 42rem at 12% 0%, rgba(188, 61, 247, 0.18), transparent 62%),
+    radial-gradient(48rem 34rem at 96% 8%, rgba(38, 166, 154, 0.12), transparent 64%),
+    radial-gradient(circle, rgba(188, 61, 247, 0.09) 1px, transparent 1.6px);
   --glass-bg: rgba(16, 29, 36, 0.74);
   --glass-border: rgba(147, 176, 187, 0.16);
   --glass-dark-bg: rgba(7, 16, 21, 0.7);
@@ -134,9 +135,16 @@
     scroll-behavior: smooth;
   }
   body {
+    position: relative;
+    isolation: isolate;
     background-color: var(--color-background);
     background-image: var(--gradient-ambient);
+    background-size:
+      auto,
+      auto,
+      26px 26px;
     background-attachment: fixed;
+    background-blend-mode: screen, screen, normal;
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -151,6 +159,49 @@
   }
   ::selection {
     background: color-mix(in oklab, var(--teal) 30%, transparent);
+  }
+}
+
+/* Violeta texturizado inspirado en el patrón proporcionado, adaptado al tema oscuro. */
+body::before {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  opacity: 0.58;
+  background-color: transparent;
+  background-image:
+    radial-gradient(circle at center, rgba(188, 61, 247, 0.13), transparent 58%),
+    repeating-radial-gradient(
+      circle at center,
+      rgba(188, 61, 247, 0.13) 0 1px,
+      transparent 1px 11px
+    );
+  background-blend-mode: screen;
+  mask-image: radial-gradient(ellipse at center, transparent 16%, rgba(0, 0, 0, 0.78) 100%);
+  -webkit-mask-image: radial-gradient(ellipse at center, transparent 16%, rgba(0, 0, 0, 0.78) 100%);
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  animation: violet-drift 28s ease-in-out infinite alternate;
+}
+
+@keyframes violet-drift {
+  from {
+    transform: scale(1);
+    filter: hue-rotate(0deg);
+  }
+  to {
+    transform: scale(1.08);
+    filter: hue-rotate(16deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
   }
 }
 

@@ -16,6 +16,8 @@ import { Route as PanelRouteImport } from './routes/panel'
 import { Route as ProfesionalesRouteImport } from './routes/profesionales'
 import { Route as PublicarRouteImport } from './routes/publicar'
 import { Route as TrabajosRouteImport } from './routes/trabajos'
+import { Route as PanelClienteRouteImport } from './routes/panel/cliente'
+import { Route as PanelEspecialistaRouteImport } from './routes/panel/especialista'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,34 +54,50 @@ const TrabajosRoute = TrabajosRouteImport.update({
   path: '/trabajos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PanelClienteRoute = PanelClienteRouteImport.update({
+  id: '/cliente',
+  path: '/cliente',
+  getParentRoute: () => PanelRoute,
+} as any)
+const PanelEspecialistaRoute = PanelEspecialistaRouteImport.update({
+  id: '/especialista',
+  path: '/especialista',
+  getParentRoute: () => PanelRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/acceso': typeof AccesoRoute
   '/cuenta': typeof CuentaRoute
-  '/panel': typeof PanelRoute
+  '/panel': typeof PanelRouteWithChildren
   '/profesionales': typeof ProfesionalesRoute
   '/publicar': typeof PublicarRoute
   '/trabajos': typeof TrabajosRoute
+  '/panel/cliente': typeof PanelClienteRoute
+  '/panel/especialista': typeof PanelEspecialistaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/acceso': typeof AccesoRoute
   '/cuenta': typeof CuentaRoute
-  '/panel': typeof PanelRoute
+  '/panel': typeof PanelRouteWithChildren
   '/profesionales': typeof ProfesionalesRoute
   '/publicar': typeof PublicarRoute
   '/trabajos': typeof TrabajosRoute
+  '/panel/cliente': typeof PanelClienteRoute
+  '/panel/especialista': typeof PanelEspecialistaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/acceso': typeof AccesoRoute
   '/cuenta': typeof CuentaRoute
-  '/panel': typeof PanelRoute
+  '/panel': typeof PanelRouteWithChildren
   '/profesionales': typeof ProfesionalesRoute
   '/publicar': typeof PublicarRoute
   '/trabajos': typeof TrabajosRoute
+  '/panel/cliente': typeof PanelClienteRoute
+  '/panel/especialista': typeof PanelEspecialistaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +109,8 @@ export interface FileRouteTypes {
     | '/profesionales'
     | '/publicar'
     | '/trabajos'
+    | '/panel/cliente'
+    | '/panel/especialista'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +120,8 @@ export interface FileRouteTypes {
     | '/profesionales'
     | '/publicar'
     | '/trabajos'
+    | '/panel/cliente'
+    | '/panel/especialista'
   id:
     | '__root__'
     | '/'
@@ -109,13 +131,15 @@ export interface FileRouteTypes {
     | '/profesionales'
     | '/publicar'
     | '/trabajos'
+    | '/panel/cliente'
+    | '/panel/especialista'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccesoRoute: typeof AccesoRoute
   CuentaRoute: typeof CuentaRoute
-  PanelRoute: typeof PanelRoute
+  PanelRoute: typeof PanelRouteWithChildren
   ProfesionalesRoute: typeof ProfesionalesRoute
   PublicarRoute: typeof PublicarRoute
   TrabajosRoute: typeof TrabajosRoute
@@ -172,14 +196,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TrabajosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/panel/cliente': {
+      id: '/panel/cliente'
+      path: '/cliente'
+      fullPath: '/panel/cliente'
+      preLoaderRoute: typeof PanelClienteRouteImport
+      parentRoute: typeof PanelRoute
+    }
+    '/panel/especialista': {
+      id: '/panel/especialista'
+      path: '/especialista'
+      fullPath: '/panel/especialista'
+      preLoaderRoute: typeof PanelEspecialistaRouteImport
+      parentRoute: typeof PanelRoute
+    }
   }
 }
+
+interface PanelRouteChildren {
+  PanelClienteRoute: typeof PanelClienteRoute
+  PanelEspecialistaRoute: typeof PanelEspecialistaRoute
+}
+
+const PanelRouteChildren: PanelRouteChildren = {
+  PanelClienteRoute: PanelClienteRoute,
+  PanelEspecialistaRoute: PanelEspecialistaRoute,
+}
+
+const PanelRouteWithChildren = PanelRoute._addFileChildren(PanelRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccesoRoute: AccesoRoute,
   CuentaRoute: CuentaRoute,
-  PanelRoute: PanelRoute,
+  PanelRoute: PanelRouteWithChildren,
   ProfesionalesRoute: ProfesionalesRoute,
   PublicarRoute: PublicarRoute,
   TrabajosRoute: TrabajosRoute,

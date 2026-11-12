@@ -18,7 +18,7 @@ const registerSchema = z.object({
     .max(24)
     .regex(/^\+?[\d\s().-]+$/),
   password: z.string().min(10).max(128),
-  role: z.enum(["cliente", "profesional", "ambos"]),
+  role: z.enum(["cliente", "profesional"]),
   contactConsent: z.literal(true),
   trade: z.string().optional(),
   zone: z.string().trim().min(2).max(80),
@@ -48,7 +48,7 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(async ()
 export const registerUser = createServerFn({ method: "POST" })
   .validator(registerSchema)
   .handler(async ({ data }) => {
-    if ((data.role === "profesional" || data.role === "ambos") && !data.trade)
+    if (data.role === "profesional" && !data.trade)
       throw new Error("Elige tu oficio para crear el perfil profesional.");
     return createAccount(data);
   });

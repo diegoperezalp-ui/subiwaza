@@ -28,8 +28,10 @@ import {
 } from "@/lib/domus";
 import { domusActions, useDomus } from "@/lib/domus-store";
 import { cn } from "@/lib/utils";
+import { requireAccount } from "@/lib/route-access";
 
 export const Route = createFileRoute("/trabajos")({
+  beforeLoad: () => requireAccount("profesional"),
   head: () => ({
     meta: [
       { title: "Trabajos disponibles — Subiwaza" },
