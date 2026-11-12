@@ -1,0 +1,239 @@
+/*
+ * Tailwind v4 entry: config lives here, with no tailwind.config.js or PostCSS plugin.
+ * Keep every @import in this top block. Never @import a remote URL; fonts load via <link> in __root.tsx.
+ */
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-display: "Cormorant Garamond", ui-serif, Georgia, serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-slate: var(--slate);
+  --color-slate-soft: var(--slate-soft);
+  --color-ink: var(--ink);
+  --color-ink-foreground: var(--ink-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-gold: var(--gold);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --radius: 0.875rem;
+
+  /* Subiwaza brand colors: edit these two values to retheme the interface. */
+  --teal: #26a69a;
+  --slate: #607d8b;
+  --slate-soft: rgba(96, 125, 139, 0.16);
+  --ink: #0b141a;
+  --ink-foreground: #f3f8f9;
+  --gold: #e5bd73;
+
+  --background: #091217;
+  --foreground: #eef5f6;
+  --card: #101d24;
+  --card-foreground: #eef5f6;
+  --popover: #12232a;
+  --popover-foreground: #eef5f6;
+  --primary: var(--teal);
+  --primary-foreground: #06211f;
+  --primary-soft: rgba(38, 166, 154, 0.16);
+  --secondary: #1a2a32;
+  --secondary-foreground: #d8e3e6;
+  --muted: #15242b;
+  --muted-foreground: #a4b5bb;
+  --accent: rgba(38, 166, 154, 0.18);
+  --accent-foreground: #b8eee8;
+  --destructive: oklch(0.577 0.2 27);
+  --destructive-foreground: #fff8f7;
+  --border: rgba(96, 125, 139, 0.3);
+  --input: rgba(96, 125, 139, 0.4);
+  --ring: var(--teal);
+  --chart-1: var(--teal);
+  --chart-2: var(--slate);
+  --chart-3: #91d8cf;
+  --chart-4: #9aadb5;
+  --chart-5: #e5bd73;
+  --sidebar: #0d1920;
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--teal);
+  --sidebar-primary-foreground: #06211f;
+  --sidebar-accent: var(--secondary);
+  --sidebar-accent-foreground: var(--secondary-foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--teal);
+
+  /* Gradients, glass & shadows */
+  --gradient-brand: linear-gradient(135deg, var(--teal), var(--slate));
+  --gradient-ink: linear-gradient(160deg, #172b33, #0b151b);
+  --gradient-hero-overlay: linear-gradient(
+    100deg,
+    rgba(7, 15, 20, 0.92) 0%,
+    rgba(7, 15, 20, 0.72) 42%,
+    rgba(7, 15, 20, 0.25) 100%
+  );
+  --gradient-ambient:
+    radial-gradient(60rem 40rem at 10% -10%, rgba(38, 166, 154, 0.16), transparent 60%),
+    radial-gradient(50rem 36rem at 100% 10%, rgba(96, 125, 139, 0.17), transparent 60%);
+  --glass-bg: rgba(16, 29, 36, 0.74);
+  --glass-border: rgba(147, 176, 187, 0.16);
+  --glass-dark-bg: rgba(7, 16, 21, 0.7);
+  --glass-dark-border: rgba(255, 255, 255, 0.16);
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.16), 0 12px 28px -12px rgba(0, 0, 0, 0.4);
+  --shadow-elegant: 0 30px 70px -30px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 10px 30px -10px color-mix(in srgb, var(--teal) 55%, transparent);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background-color: var(--color-background);
+    background-image: var(--gradient-ambient);
+    background-attachment: fixed;
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--teal) 30%, transparent);
+  }
+}
+
+@utility glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: var(--shadow-soft);
+}
+
+@utility glass-dark {
+  background: var(--glass-dark-bg);
+  border: 1px solid var(--glass-dark-border);
+  backdrop-filter: blur(20px) saturate(130%);
+  -webkit-backdrop-filter: blur(20px) saturate(130%);
+}
+
+@utility bg-gradient-brand {
+  background-image: var(--gradient-brand);
+}
+
+@utility bg-gradient-ink {
+  background-image: var(--gradient-ink);
+}
+
+@utility bg-hero-overlay {
+  background-image: var(--gradient-hero-overlay);
+}
+
+@utility text-gradient-brand {
+  background-image: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+
+@utility shadow-elegant {
+  box-shadow: var(--shadow-elegant);
+}
+
+@utility shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
+
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+@utility hairline {
+  background-image: linear-gradient(90deg, transparent, var(--color-border), transparent);
+  height: 1px;
+}
+
+@utility lift {
+  transition:
+    transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-elegant);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-rise {
+  animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
