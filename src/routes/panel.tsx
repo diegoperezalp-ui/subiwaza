@@ -1,4 +1,4 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -32,9 +32,9 @@ import { cn } from "@/lib/utils";
 import { dashboardPath, requireAccount } from "@/lib/route-access";
 
 export const Route = createFileRoute("/panel")({
-  beforeLoad: async () => {
+  beforeLoad: async ({ location }) => {
     const user = await requireAccount();
-    throw redirect({ to: dashboardPath(user) });
+    if (location.pathname === "/panel") throw redirect({ to: dashboardPath(user) });
   },
   head: () => ({
     meta: [
@@ -53,8 +53,12 @@ export const Route = createFileRoute("/panel")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: Panel,
+  component: PanelLayout,
 });
+
+function PanelLayout() {
+  return <Outlet />;
+}
 
 const STATUS: Record<Job["status"], { label: string; variant: "soft" | "slate" | "default" }> = {
   abierto: { label: "Recibiendo propuestas", variant: "soft" },
